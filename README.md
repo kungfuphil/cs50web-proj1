@@ -1,11 +1,11 @@
-# Project 1
+# Books - Project 1
 
 Web Programming with Python and JavaScript
-
 
 ## Tables
 
 ### Users
+
 |Column          |Type        |Comment        |
 |----------------|------------|---------------|
 |user_id         |serial      |               |

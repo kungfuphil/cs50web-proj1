@@ -30,6 +30,39 @@ def index():
 
     return render_template("index.html")
 
+@APP.route("/login", methods=["GET", "POST"])
+def login():
+    """Login a user"""
+
+    if request.method == "GET":
+        return render_template("login.html")
+    if request.method == "POST":
+        # Make sure all fields are filled out
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        if not username:
+            return "Please enter your username"
+
+        if not password:
+            return "Please enter your password"
+
+        # Check password against hash in database
+        row = DB.execute("SELECT user_id, username, password FROM users WHERE UPPER(username) = UPPER(:username)",
+                         {"username": username}).fetchone()
+
+        if not row:
+            return "Username does not exist"
+
+        if not sha256_crypt.verify(password, row.password):
+            return "Username/password combination incorrect"
+
+        # set session["user_id"] = whoever is logged in
+        session["user_id"] = row.user_id
+
+        return render_template("index.html")
+
+
 @APP.route("/register", methods=["GET", "POST"])
 def register():
     """Registers a new user"""
