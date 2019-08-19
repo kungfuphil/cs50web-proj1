@@ -2,6 +2,20 @@
 
 Web Programming with Python and JavaScript
 
+## Set-up
+
+### Environment Variables (Windows)
+
+```dos
+set FLASK_APP=application.py
+
+REM If you want to enable debugging
+set FLASK_DEBUG=1
+
+REM Set this to whatever the URL of your database is
+set DATABASE_URL=<URL>
+```
+
 ## Tables
 
 ### Users

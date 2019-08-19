@@ -2,7 +2,7 @@
 import os
 import sys
 
-from flask import Flask, session, render_template, request
+from flask import Flask, session, render_template, request, redirect, url_for
 from passlib.hash import sha256_crypt
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -62,6 +62,13 @@ def login():
 
         return render_template("index.html")
 
+
+@APP.route("/logout")
+def logout():
+    """Logs out"""
+    session.clear()
+
+    return redirect(url_for("index"))
 
 @APP.route("/register", methods=["GET", "POST"])
 def register():
