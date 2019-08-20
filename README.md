@@ -27,3 +27,23 @@ set DATABASE_URL=<URL>
 |password        |varchar(100)|Hashed password|
 |insert_timestamp|timestamp   |               |
 |update_timestamp|timestamp   |               |
+
+### Books
+
+|Column          |Type        |Comment        |
+|----------------|------------|---------------|
+|isbn            |varchar(13) |               |
+|title           |varchar(50) |               |
+|author_id       |int         |               |
+|year            |number(4)   |               |
+
+### Authors
+
+|Column          |Type        |Comment        |
+|----------------|------------|---------------|
+|author_id       |serial      |               |
+|name            |varchar(50) |               |
+
+## import.py
+
+This file is used to import the records in books.csv into the database.
