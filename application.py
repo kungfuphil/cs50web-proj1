@@ -7,6 +7,7 @@ from passlib.hash import sha256_crypt
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from flask_session import Session
+from helpers import login_required
 
 APP = Flask(__name__)
 
@@ -60,7 +61,7 @@ def login():
         # set session["user_id"] = whoever is logged in
         session["user_id"] = row.user_id
 
-        return render_template("index.html")
+        return redirect(url_for("search"))
 
 
 @APP.route("/logout")
@@ -109,3 +110,27 @@ def register():
         DB.commit()
 
         return "Successfully registered user"
+
+@APP.route("/search")
+@login_required
+def search():
+    """Search books by title, author, and/or isbn"""
+    title = request.args.get("title")
+    author = request.args.get("author")
+    isbn = request.args.get("isbn")
+
+    query = """SELECT b.title, a.name, b.year, b.isbn
+                FROM books b
+                INNER JOIN authors a
+                ON b.author_id = a.author_id
+                WHERE LOWER(b.title) LIKE :title
+                AND LOWER(a.name) LIKE :author
+                AND LOWER(b.isbn) LIKE :isbn"""
+
+    title = f"%{title.lower()}%" if not None else ""
+    author = f"%{author.lower()}%" if not None else ""
+    isbn = f"%{isbn.lower()}%" if not None else  ""
+
+    books = DB.execute(query, {"title": title, "author": author, "isbn": isbn}).fetchall()
+
+    return render_template("search.html", books=books)

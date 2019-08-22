@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Search
+{% endblock %}
+
+{% block body %}
+<h1>Search</h1>
+
+<form action="{{url_for('search')}}">
+    <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" class="form-control" id="title" placeholder="Enter title" name="title">
+    </div>
+    <div class="form-group">
+        <label for="author">Author</label>
+        <input type="text" class="form-control" id="author" placeholder="Enter author" name="author">
+    </div>
+    <div class="form-group">
+        <label for="isbn">ISBN</label>
+        <input type="text" class="form-control" id="isbn" placeholder="Enter ISBN" name="isbn">
+    </div>
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+
+<!-- TODO: Make sure all fields are filled out -->
+
+<!-- TODO: Use DataTables for the table -->
+
+{% if books %}
+<table class="table table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Author</th>
+            <th scope="col">Year</th>
+            <th scope="col">ISBN</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for book in books %}
+        <tr>
+            <td>{{book.title}}</td>
+            <td>{{book.name}}</td>
+            <td>{{book.year}}</td>
+            <td>{{book.isbn}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+{% endblock %}
