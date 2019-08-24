@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block title %}
+{{book.title}} - Details
+{% endblock %}
+
+{% block body %}
+<h1>{{book.title}} - Details</h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <td>{{book.title}}</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th>Author</th>
+            <td>{{book.name}}</td>
+        </tr>
+        <tr>
+            <th>Year</th>
+            <td>{{book.year}}</td>
+        </tr>
+        <tr>
+            <th>ISBN</th>
+            <td>{{book.isbn}}</td>
+        </tr>
+    </tbody>
+</table>
+
+{% endblock %}

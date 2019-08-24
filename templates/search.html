@@ -40,7 +40,7 @@ Search
     <tbody>
         {% for book in books %}
         <tr>
-            <td>{{book.title}}</td>
+            <td><a href="{{url_for('book', isbn=book.isbn)}}">{{book.title}}</a></td>
             <td>{{book.name}}</td>
             <td>{{book.year}}</td>
             <td>{{book.isbn}}</td>
