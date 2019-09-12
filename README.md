@@ -20,6 +20,9 @@ set FLASK_DEBUG=1
 
 REM Set this to whatever the URL of your database is
 set DATABASE_URL=<URL>
+
+REM Set this to your Goodreads API Key
+set GOODREADS_KEY=<KEY>
 ```
 
 ## Tables
