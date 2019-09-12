@@ -7,6 +7,10 @@
 {% block body %}
 <h1>{{book.title}} - Details</h1>
 
+{% if not book.rating %}
+<a href="{{url_for('review', isbn=book.isbn)}}" class="btn btn-primary">Add Review</a>
+{% endif %}
+
 <table class="table table-striped">
     <thead>
         <tr>
@@ -29,5 +33,17 @@
         </tr>
     </tbody>
 </table>
+
+    {% if book.rating %}
+        <h3>
+            {% if book.review_title %}{{book.review_title}}{% else %}Your Review{% endif %}
+        </h3>
+
+        <p>Your Rating: {{book.rating}}</p>
+
+        {% if book.review %}
+        <p>{{book.review}}</p>
+        {% endif %}
+    {% endif %}
 
 {% endblock %}

@@ -4,6 +4,12 @@ Web Programming with Python and JavaScript
 
 ## Set-up
 
+### Install Required Modules
+
+```dos
+pip3 install -r requirements.txt
+```
+
 ### Environment Variables (Windows)
 
 ```dos
@@ -18,15 +24,12 @@ set DATABASE_URL=<URL>
 
 ## Tables
 
-### Users
+### Authors
 
 |Column          |Type        |Comment        |
 |----------------|------------|---------------|
-|user_id         |serial      |               |
-|username        |varchar(10) |               |
-|password        |varchar(100)|Hashed password|
-|insert_timestamp|timestamp   |               |
-|update_timestamp|timestamp   |               |
+|author_id       |serial      |               |
+|name            |varchar(50) |               |
 
 ### Books
 
@@ -37,12 +40,28 @@ set DATABASE_URL=<URL>
 |author_id       |int         |               |
 |year            |number(4)   |               |
 
-### Authors
+### Reviews
+
+|Column          |Type         |Comment|
+|----------------|-------------|-------|
+|review_id       |serial       |       |
+|rating          |number(2,1)  |       |
+|review          |varchar(2000)|       |
+|isbn            |varchar(13)  |       |
+|user_id         |int          |       |
+|insert_timestamp|timestamp    |       |
+|update_timestamp|timestamp    |       |
+|review_title    |varchar(140) |       |
+
+### Users
 
 |Column          |Type        |Comment        |
 |----------------|------------|---------------|
-|author_id       |serial      |               |
-|name            |varchar(50) |               |
+|user_id         |serial      |               |
+|username        |varchar(10) |               |
+|password        |varchar(100)|Hashed password|
+|insert_timestamp|timestamp   |               |
+|update_timestamp|timestamp   |               |
 
 ## import.py
 

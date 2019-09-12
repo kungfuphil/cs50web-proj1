@@ -24,6 +24,15 @@ Session(APP)
 ENGINE = create_engine(os.getenv("DATABASE_URL"))
 DB = scoped_session(sessionmaker(bind=ENGINE))
 
+# Queries used more than once
+QUERY_BOOK_BY_ISBN = """SELECT  b.title, a.name, b.year, b.isbn, r.rating, r.review_title, r.review
+                        FROM books b
+                        INNER JOIN authors a
+                        ON b.author_id = a.author_id
+                        LEFT JOIN reviews r
+                        ON b.isbn = r.isbn
+                        AND r.user_id = :user_id
+                        WHERE b.isbn = :isbn"""
 
 @APP.route("/")
 def index():
@@ -36,12 +45,7 @@ def index():
 def book(isbn):
     """Book Page: When users click on a book from the results of the search page, they should be taken to a book page, with details about the book: its title, author, publication year, ISBN number, and any reviews that users have left for the book on your website."""
 
-    book = DB.execute("""SELECT  b.title, a.name, b.year, b.isbn
-                FROM books b
-                INNER JOIN authors a
-                ON b.author_id = a.author_id
-                WHERE b.isbn = :isbn""",
-                {"isbn": isbn}).fetchone()
+    book = DB.execute(QUERY_BOOK_BY_ISBN, {"isbn": isbn, "user_id": session["user_id"]}).fetchone()
 
     # TODO: Have this return a nicer 404 page
     # Check to see if it's a valid isbn, if not return 404
@@ -172,11 +176,53 @@ def search():
 
     return render_template("search.html", books=books)
 
+@APP.route("/review/<isbn>", methods=["GET", "POST"])
+@login_required
+def review(isbn):
+    """Add or edit a book review"""
 
+    # Query what book this is
+    book = DB.execute(QUERY_BOOK_BY_ISBN, {"isbn": isbn, "user_id": session["user_id"]}).fetchone()
 
+    # If a rating already exists, don't let the user create another
+    if book.rating:
+        return redirect(url_for("book", isbn=isbn))
 
-"""Review Submission: On the book page, users should be able to submit a review: consisting of a rating on a scale of 1 to 5, as well as a text component to the review where the user can write their opinion about a book. Users should not be able to submit multiple reviews for the same book.
+    if request.method == "POST":
+        # Get all the values from the form
+        star_rating = request.form.get("starRating")
+        review_title = request.form.get("reviewTitle")
+        review = request.form.get("review")
 
+        if not star_rating:
+            return "Star Rating required"
+
+        # Make sure Star Rating is only 1 - 5. This one is required. The actual review is not.
+        star_rating = int(star_rating)
+        if not (star_rating >= 1 and star_rating <= 5):
+            return "Invalid Star Rating"
+
+        # If everything looks good, save to the DB
+        query = """INSERT INTO reviews 
+                    (rating, isbn, user_id, review_title, review)
+                    VALUES
+                    (:rating, :isbn, :user_id, :review_title, :review)"""
+
+        DB.execute(query, {
+            "rating": star_rating,
+            "isbn": isbn,
+            "user_id": session["user_id"],
+            "review_title": review_title,
+            "review": review
+        })
+        DB.commit()
+
+        # Go back to the book page
+        return redirect(url_for("book", isbn=isbn))
+    elif request.method == "GET":
+        return render_template("review.html", isbn=isbn, book=book.title)
+
+"""
 Goodreads Review Data: On your book page, you should also display (if available) the average rating and number of ratings the work has received from Goodreads.
 
 API Access: If users make a GET request to your website’s /api/<isbn> route, where <isbn> is an ISBN number, your website should return a JSON response containing the book’s title, author, publication date, ISBN number, review count, and average score. The resulting JSON should follow the format:
