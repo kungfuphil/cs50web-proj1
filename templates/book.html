@@ -31,6 +31,18 @@
             <th>ISBN</th>
             <td>{{book.isbn}}</td>
         </tr>
+        {% if goodreads_average_rating %}
+        <tr>
+            <th>Goodreads Average Rating</th>
+            <td>{{goodreads_average_rating}}</td>
+        </tr>
+        {% endif %}
+        {% if goodreads_ratings_count %}
+        <tr>
+            <th>Goodreads Ratings Count</th>
+            <td>{{goodreads_ratings_count}}</td>
+        </tr>
+        {% endif %}
     </tbody>
 </table>
 

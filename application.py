@@ -1,6 +1,7 @@
 """Books - Project 1"""
 import os
 import sys
+import requests
 
 from flask import Flask, session, render_template, request, redirect, url_for, abort
 from passlib.hash import sha256_crypt
@@ -51,9 +52,17 @@ def book(isbn):
     # Check to see if it's a valid isbn, if not return 404
     if book is None:
         abort(404)
+
+    # Get the average rating and number of ratings from Goodreads, if any
+    res = requests.get("https://www.goodreads.com/book/review_counts.json",
+            params={"key": os.getenv("GOODREADS_KEY"), "isbns": isbn})
+    goodreads_info = res.json()
+    goodreads_ratings_count = goodreads_info["books"][0]["ratings_count"]
+    goodreads_average_rating = goodreads_info["books"][0]["average_rating"]
         
     # Otherwise, display title, author, year, isbn (for now)
-    return render_template("book.html", book=book)
+    return render_template("book.html", 
+        book=book, goodreads_ratings_count=goodreads_ratings_count, goodreads_average_rating=goodreads_average_rating)
 
 @APP.route("/login", methods=["GET", "POST"])
 def login():
@@ -223,8 +232,6 @@ def review(isbn):
         return render_template("review.html", isbn=isbn, book=book.title)
 
 """
-Goodreads Review Data: On your book page, you should also display (if available) the average rating and number of ratings the work has received from Goodreads.
-
 API Access: If users make a GET request to your website’s /api/<isbn> route, where <isbn> is an ISBN number, your website should return a JSON response containing the book’s title, author, publication date, ISBN number, review count, and average score. The resulting JSON should follow the format:
 {
     "title": "Memory",
