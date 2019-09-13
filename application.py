@@ -1,4 +1,5 @@
-"""Books - Project 1"""
+"""Books - Project 1
+https://docs.cs50.net/web/2019/x/projects/1/project1.html"""
 import os
 import sys
 import requests
@@ -231,22 +232,34 @@ def review(isbn):
     elif request.method == "GET":
         return render_template("review.html", isbn=isbn, book=book.title)
 
-"""
-API Access: If users make a GET request to your website’s /api/<isbn> route, where <isbn> is an ISBN number, your website should return a JSON response containing the book’s title, author, publication date, ISBN number, review count, and average score. The resulting JSON should follow the format:
-{
-    "title": "Memory",
-    "author": "Doug Lloyd",
-    "year": 2015,
-    "isbn": "1632168146",
-    "review_count": 28,
-    "average_score": 5.0
-}
-If the requested ISBN number isn’t in your database, your website should return a 404 error.
+@APP.route("/api/<isbn>")
+def api(isbn):
+    """Retrieves book data in JSON form"""
+    query = """SELECT title, name AS author, year, isbn
+               FROM books b
+               INNER join authors a
+               ON b.author_id = a.author_id
+               WHERE isbn = :isbn"""
+    book = DB.execute(query, {"isbn": isbn}).fetchone()
 
-You should be using raw SQL commands (as via SQLAlchemy’s execute method) in order to make database queries. You should not use the SQLAlchemy ORM (if familiar with it) for this project.
+    if not book:
+        abort(404)
 
-In README.md, include a short writeup describing your project, what’s contained in each file, and (optionally) any other additional information the staff should know about your project.
+    output = {
+        "title": book.title,
+        "author": book.author,
+        "year": str(book.year),
+        "isbn": isbn
+    }
 
-If you’ve added any Python packages that need to be installed in order to run your web application, be sure to add them to requirements.txt!
+    # Get the average rating and number of ratings from Goodreads, if any
+    res = requests.get("https://www.goodreads.com/book/review_counts.json",
+                       params={"key": os.getenv("GOODREADS_KEY"), "isbns": isbn})
+    goodreads_info = res.json()
+    goodreads_ratings_count = goodreads_info["books"][0]["ratings_count"]
+    goodreads_average_rating = goodreads_info["books"][0]["average_rating"]
 
-Beyond these requirements, the design, look, and feel of the website are up to you! You’re also welcome to add additional features to your website, so long as you meet the requirements laid out in the above specification!"""
+    output.update({"review_count": goodreads_ratings_count})
+    output.update({"average_score": goodreads_average_rating})
+
+    return output
